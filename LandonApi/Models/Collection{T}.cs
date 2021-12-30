@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 
 namespace LandonApi.Models
 {
-    public class Room : Resource
+    public class Collection<T> : Resource
     {
-        public string Name { get; set; }
-
-        public decimal Rate { get; set; }
+        public T[] Value { get; set; }
     }
 }

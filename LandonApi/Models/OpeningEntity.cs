@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace LandonApi.Models
 {
-    public class Room : Resource
+    public class OpeningEntity : BookingRange
     {
-        public string Name { get; set; }
+        public Guid RoomId { get; set; }
 
-        public decimal Rate { get; set; }
+        public int Rate { get; set; }
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using LandonApi.Services;
 using LandonApi.Infrastructure;
+using Newtonsoft.Json.Serialization;
 
 namespace LandonApi
 {
@@ -28,24 +29,38 @@ namespace LandonApi
         {
 
             services.Configure<HotelInfo>(Configuration.GetSection("Info"));
+            services.Configure<HotelOptions>(Configuration);
+            services.Configure<PagingOptions>(Configuration.GetSection("DefaultPagingOptions"));
+            
 
             services.AddScoped<IRoomService, DefaultRoomService>();
+            services.AddScoped<IOpeningService, DefaultOpeningService>();
+            services.AddScoped<IBookingService, DefaultBookingService>();
+            services.AddScoped<IDateLogicService, DefaultDateLogicService>();
 
             services.AddDbContext<HotelApiDbContext>(options => {
                 var connectionString = Configuration.GetSection("ConnectionString").Value;
                 options.UseSqlServer(connectionString);
             });
-            
+
             /*
             services.AddDbContext<HotelApiDbContext>(
                 options => options.UseInMemoryDatabase("landondb"));
             */
+
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
+
             services.AddMvc(options =>
             {
                 options.Filters.Add<JsonExceptionFilter>();
                 options.Filters.Add<RequireHttpsOrCloseAttribute>();
+                options.Filters.Add<LinkRewritingFilter>();
                 options.EnableEndpointRouting = false;
             });
+
             //services.AddSwaggerDocument();
 
             services.AddRouting(options => options.LowercaseUrls = true);
@@ -92,6 +107,16 @@ namespace LandonApi
             });
 
             services.AddAutoMapper( options => options.AddProfile<MappingProfile>());
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errorResponse = new ApiError(context.ModelState);
+                    return new BadRequestObjectResult(errorResponse);
+                };
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

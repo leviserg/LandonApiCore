@@ -17,7 +17,7 @@ namespace LandonApi
         {
             //CreateHostBuilder(args).Build().Run();
             var host = CreateHostBuilder(args).Build();
-            InitializeDatabase(host);
+            InitializeDatabaseIfEmpty(host);
             host.Run();
         }
 
@@ -28,18 +28,19 @@ namespace LandonApi
                     webBuilder.UseStartup<Startup>();
                 });
 
-        public static void InitializeDatabase(IHost host)
+        public static void InitializeDatabaseIfEmpty(IHost host)
         {
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
+                var logger = services.GetRequiredService<ILogger<Program>>();
                 try
                 {
-                    SeedData.InitializeAsync(services).Wait();
+                    SeedData.InitializeIfEmptyAsync(services).Wait();
+                    logger.LogInformation("Database has been successfully seeded");
                 }
                 catch (Exception ex)
                 {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(ex, "An error occurred seeding the database.");
                 }
             }

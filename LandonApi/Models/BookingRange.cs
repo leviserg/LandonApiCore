@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace LandonApi.Models
 {
-    public class Room : Resource
+    public class BookingRange
     {
-        public string Name { get; set; }
+        public DateTimeOffset StartAt { get; set; }
 
-        public decimal Rate { get; set; }
+        public DateTimeOffset EndAt { get; set; }
     }
 }
