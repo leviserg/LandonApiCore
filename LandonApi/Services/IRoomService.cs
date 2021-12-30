@@ -12,6 +12,6 @@ namespace LandonApi.Services
 
         Task<Room> GetRoomAsync(Guid id);
 
-        Task<PagedResults<Room>> GetPagedRoomsAsync(PagingOptions pagingOptions);
+        Task<PagedResults<Room>> GetPagedRoomsAsync(PagingOptions pagingOptions, SortOptions<Room, RoomEntity> sortOptions);
     }
 }

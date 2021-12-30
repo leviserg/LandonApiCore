@@ -30,7 +30,9 @@ namespace LandonApi.Controllers
 
         [HttpGet(Name = nameof(GetAllRooms))]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Collection<Room>>> GetAllRooms([FromQuery] PagingOptions pagingOptions = null)
+        public async Task<ActionResult<Collection<Room>>> GetAllRooms(
+            [FromQuery] PagingOptions pagingOptions = null,
+            [FromQuery] SortOptions<Room, RoomEntity> sortOptions = null)
         {
             /*
             var rooms = await _roomService.GetRoomsAsync();
@@ -45,7 +47,7 @@ namespace LandonApi.Controllers
             pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
             pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
-            var rooms = await _roomService.GetPagedRoomsAsync(pagingOptions);
+            var rooms = await _roomService.GetPagedRoomsAsync(pagingOptions, sortOptions);
 
             var collection = PagedCollection<Room>.Create(
                 Link.ToCollection(nameof(GetAllRooms)),
@@ -70,16 +72,16 @@ namespace LandonApi.Controllers
 
         // GET /rooms/openings
         [HttpGet("openings", Name = nameof(GetAllRoomOpenings))]
-        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Collection<Opening>>> GetAllRoomOpenings([FromQuery] PagingOptions pagingOptions = null)
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<Collection<Opening>>> GetAllRoomOpenings(
+            [FromQuery] PagingOptions pagingOptions,
+            [FromQuery] SortOptions<Opening, OpeningEntity> sortOptions)
         {
-
             pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
             pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
-
-            var openings = await _openingService.GetOpeningsAsync(pagingOptions);
+            var openings = await _openingService.GetOpeningsAsync(pagingOptions, sortOptions);
 
             var collection = PagedCollection<Opening>.Create(
                 Link.ToCollection(nameof(GetAllRoomOpenings)),

@@ -44,8 +44,9 @@ namespace LandonApi.Services
             return await query.ToArrayAsync();
         }
 
-        public async Task<PagedResults<Room>> GetPagedRoomsAsync(PagingOptions pagingOptions)
+        public async Task<PagedResults<Room>> GetPagedRoomsAsync(PagingOptions pagingOptions, SortOptions<Room, RoomEntity> sortOptions)
         {
+            /*
             var rooms = await _context.Rooms.ProjectTo<Room>(_mappingConfiguration).ToArrayAsync();
 
             var pagedRooms = rooms
@@ -56,6 +57,24 @@ namespace LandonApi.Services
             {
                 Items = pagedRooms,
                 TotalSize = rooms.Count()
+            };
+            */
+
+            IQueryable<RoomEntity> query = _context.Rooms;
+            query = sortOptions.Apply(query);
+
+            var size = await query.CountAsync();
+
+            var items = await query
+                .Skip(pagingOptions.Offset.Value)
+                .Take(pagingOptions.Limit.Value)
+                .ProjectTo<Room>(_mappingConfiguration)
+                .ToArrayAsync();
+
+            return new PagedResults<Room>
+            {
+                Items = items,
+                TotalSize = size
             };
         }
 
