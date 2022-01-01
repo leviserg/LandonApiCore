@@ -28,11 +28,14 @@ namespace LandonApi.Controllers
             _defaultPagingOptions = defaultPagingOptionsWrapper.Value;
         }
 
+
+        // GET /rooms?offet=1&limit=2&orderBy=rate desc
         [HttpGet(Name = nameof(GetAllRooms))]
         [ProducesResponseType(200)]
         public async Task<ActionResult<Collection<Room>>> GetAllRooms(
             [FromQuery] PagingOptions pagingOptions = null,
-            [FromQuery] SortOptions<Room, RoomEntity> sortOptions = null)
+            [FromQuery] SortOptions<Room, RoomEntity> sortOptions = null,
+            [FromQuery] SearchOptions<Room,RoomEntity> searchOptions = null)
         {
             /*
             var rooms = await _roomService.GetRoomsAsync();
@@ -47,7 +50,7 @@ namespace LandonApi.Controllers
             pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
             pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
-            var rooms = await _roomService.GetPagedRoomsAsync(pagingOptions, sortOptions);
+            var rooms = await _roomService.GetPagedRoomsAsync(pagingOptions, sortOptions, searchOptions);
 
             var collection = PagedCollection<Room>.Create(
                 Link.ToCollection(nameof(GetAllRooms)),
@@ -70,18 +73,29 @@ namespace LandonApi.Controllers
             return room;
         }
 
-        // GET /rooms/openings
+        // GET /rooms/openings/{?offset=1&limit=2&orderBy=name(rate,startAt,endAt){ desc}}
+        /*
+            Search functionality:
+                    ?search={field} {operator: [eq (numeric, string), 
+                        lt (numeric, date), lte, gt, gte],
+                        sw (startsWith), co (contains) - for String Search Pattern
+                        } {value}
+                    + multiple search:
+                    GET /rooms/openings?search=rate lt 199.99&search=startAt gte 2022-01-10
+         */
         [HttpGet("openings", Name = nameof(GetAllRoomOpenings))]
         [ProducesResponseType(400)]
         [ProducesResponseType(200)]
         public async Task<ActionResult<Collection<Opening>>> GetAllRoomOpenings(
             [FromQuery] PagingOptions pagingOptions,
-            [FromQuery] SortOptions<Opening, OpeningEntity> sortOptions)
+            [FromQuery] SortOptions<Opening, OpeningEntity> sortOptions,
+            [FromQuery] SearchOptions<Opening, OpeningEntity> searchOptions)
         {
             pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
             pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
-            var openings = await _openingService.GetOpeningsAsync(pagingOptions, sortOptions);
+            var openings = await _openingService.GetOpeningsAsync(
+                pagingOptions, sortOptions, searchOptions);
 
             var collection = PagedCollection<Opening>.Create(
                 Link.ToCollection(nameof(GetAllRoomOpenings)),
