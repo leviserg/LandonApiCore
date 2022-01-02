@@ -9,7 +9,12 @@ namespace LandonApi.Models
 
         public static PagedCollection<T> Create(
             Link self, T[] items, int size, PagingOptions pagingOptions)
-            => new PagedCollection<T>
+            => Create<PagedCollection<T>>(self, items, size, pagingOptions);
+
+        public static TResponse Create<TResponse>(
+            Link self, T[] items, int size, PagingOptions pagingOptions)
+            where TResponse : PagedCollection<T>, new()
+            => new TResponse
             {
                 Selfhref = self,
                 Value = items,

@@ -69,7 +69,6 @@ namespace LandonApi.Services
             query = sortOptions.Apply(query);
 
             var size = await query.CountAsync();
-
             var items = await query
                 .Skip(pagingOptions.Offset.Value)
                 .Take(pagingOptions.Limit.Value)
